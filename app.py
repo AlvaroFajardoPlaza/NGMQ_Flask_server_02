@@ -7,7 +7,7 @@ import mysql.connector
 from src.database.db_mysql import getConnection
 
 # Importamos las funciones de los módulos de scrapperBot, auth y trivia
-from src.ScrapperBot.scraper_bot import scrapeCategories, scrapeQuestionsAnswers, categorizeQuestions
+from src.ScrapperBot.scraper_bot import OptimizeCategorizeQuestions, scrapeCategories, scrapeQuestionsAnswers, categorizeQuestions
 from src.AuthMod.auth_module import getAllUsers, register_user, login_user
 from src.TriviaMod.trivia_module import getCategories, randomTriviaTest
 
@@ -58,6 +58,7 @@ def populate_questions_answers():
 @app.route("/categorize_questions", methods=['GET', 'POST'])
 def populate_questions_categories():
     result = categorizeQuestions()
+    # result = OptimizeCategorizeQuestions()
     return result
 
 

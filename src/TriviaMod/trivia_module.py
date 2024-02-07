@@ -48,23 +48,3 @@ def randomTriviaTest():
     print(final_random_trivia)
     return final_random_trivia
 
-
-
-    # for x in range(10):
-    #     question = ()
-    #     if question:
-    #         selected_questions_ids.add(question[0])
-    #         register = {
-    #             "id_pregunta" : question[0],
-    #             "pregunta" : question[1],
-    #             "ans1" : question[2],
-    #             "ans2" : question[3],
-    #             "ans3" : question[4],
-    #             "category" : question[5],
-    #         }
-    #         random_test.append(register)
-    #     else:
-    #         print("No hay más preguntas disponibles en la bbdd")
-
-
-

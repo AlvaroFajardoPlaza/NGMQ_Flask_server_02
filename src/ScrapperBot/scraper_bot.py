@@ -240,98 +240,166 @@ def categorizeQuestions():
         connection = getConnection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM questions_answers")
-        all_questions_list = cursor.fetchall()
+        all_questions_list: list = cursor.fetchall() # Listado de tuplas
         connection.close()
         
     except Exception as e:
         print(type(e).__name__, e)
         return e
 
-    # print(type(all_questions_list))
-    # print(all_questions_list)
-    # Tenemos que trnasformar cada tupla en un array o lista
     
-    connection = getConnection()
-    cursor = connection.cursor()
+    converted_questions_list:list = []
     for question in all_questions_list:
         converted_question = list(question)
-
-        try:
-            category_id = 0 
-
-            if 1 <= converted_question[0] < 11:
-                category_id = 1
-                cursor.execute("UPDATE questions_answers SET category_id=%s WHERE id>=1 AND id<11", category_id)
-            elif 11 <= converted_question[0] < 21:
-                category_id = 2
-            elif 21 <= converted_question[0] < 31:
-                category_id = 3 
-            
-            if 31 <= converted_question[0] < 42:
-                category_id = 4
-            elif 42 <= converted_question[0] < 51:
-                category_id = 5
-            elif 51 <= converted_question[0] < 59:
-                category_id = 6 
-            
-            if 59 <= converted_question[0] < 69:
-                category_id = 7
-            elif 69 <= converted_question[0] < 79:
-                category_id = 8
-            elif 79 <= converted_question[0] < 89:
-                category_id = 9
-
-            if 89 <= converted_question[0] < 99:
-                category_id = 10
-            elif 99 <= converted_question[0] < 109:
-                category_id = 11
-            elif 109 <= converted_question[0] < 119:
-                category_id = 12
-            elif 119 <= converted_question[0] < 128:
-                category_id = 13
-            else:
-                print("Haz una segunda comprobación")
- 
-
-        except Exception as e:
-            print(type(e).__name__, e)
-            return "{}".format(e)
-
-        connection.commit()
-        connection.close()
-        return "Categorías pobladas!"
+        converted_questions_list.append(converted_question)
     
+    #print(converted_questions_list)
 
-        #    try:
-        #     if (converted_question[0] >= 1) and (converted_question[0] < 11):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (1)")
-        #     elif (converted_question[0] >= 11) and (converted_question[0] < 21):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (2)")
-        #     elif (converted_question[0] >= 21) and (converted_question[0] < 31):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (3)")
+    connection = getConnection()
+    cursor = connection.cursor()
+    for converted_question in converted_questions_list:
+        if (converted_question[0] >= 1) and (converted_question[0] < 10 ):
+            #print(converted_question)
+            category_id = 1
+            sql_query = ("UPDATE questions_answers SET category_id=%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 1, 9)
+            cursor.execute(sql_query, val)
+
+
+        elif (converted_question[0] >= 10) and (converted_question[0] < 20 ):
+            #print(converted_question)
+            category_id = 2
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 10, 20)
+            cursor.execute(sql_query, val)
+
+
+        elif (converted_question[0] >= 20) and (converted_question[0] < 30 ):
+            category_id = 3
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 20, 30)
+            cursor.execute(sql_query, val)
+
             
-        #     elif (converted_question[0] >= 31) and (converted_question[0] < 41):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (4)")
-        #     elif (converted_question[0] >= 41) and (converted_question[0] < 50):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (5)")
-        #     elif (converted_question[0] >= 50) and (converted_question[0] < 59):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (6)")
+        elif (converted_question[0] >= 30) and (converted_question[0] < 41 ):
+            category_id = 4
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 30, 41)
+            cursor.execute(sql_query, val)
+
+        elif (converted_question[0] >= 40) and (converted_question[0] < 50 ):  
+            category_id = 5
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 40, 49)
+            cursor.execute(sql_query, val)
+
+        elif (converted_question[0] >= 50) and (converted_question[0] < 58 ):
+            category_id = 6
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 50, 57)
+            cursor.execute(sql_query, val)
+
+        elif (converted_question[0] >= 58) and (converted_question[0] < 68 ):
+            category_id = 7
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 58, 67)
+            cursor.execute(sql_query, val)
+        
+        elif (converted_question[0] >= 68) and (converted_question[0] < 78 ):
+            category_id = 8
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 68, 77)
+            cursor.execute(sql_query, val)
+
+        elif (converted_question[0] >= 78) and (converted_question[0] < 88 ):
+            category_id = 9
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 78, 87)
+            cursor.execute(sql_query, val)
+
+        elif (converted_question[0] >= 88) and (converted_question[0] < 98 ):
+            category_id = 10
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 88, 97)
+            cursor.execute(sql_query, val)
+
+        elif (converted_question[0] >= 98) and (converted_question[0] < 108 ):
+            category_id = 11
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 98, 107)
+            cursor.execute(sql_query, val)
+        
+        elif (converted_question[0] >= 108) and (converted_question[0] < 118 ):
+            category_id = 12
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 108, 117)
+            cursor.execute(sql_query, val)
+        
+        elif (converted_question[0] >= 118) and (converted_question[0] < 127 ):
+            category_id = 13
+            sql_query = ("UPDATE questions_answers SET category_id =%s "
+                        "WHERE id BETWEEN %s AND %s")
+            val = (category_id, 118, 126)
+            cursor.execute(sql_query, val)
+   
+        else:
+            print("Haz una segunda comprobación")
             
-        #     elif (converted_question[0] >= 59) and (converted_question[0] < 69):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (7)")
-        #     elif (converted_question[0] >= 69) and (converted_question[0] < 79):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (8)")
-        #     elif (converted_question[0] >= 79) and (converted_question[0] < 89):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (9)")
-            
-        #     elif (converted_question[0] >= 89) and (converted_question[0] < 99):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (10)")
-        #     elif (converted_question[0] >= 99) and (converted_question[0] < 109):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (11)")
-        #     elif (converted_question[0] >= 109) and (converted_question[0] < 119):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (12)")
-        #     elif (converted_question[0] >= 119) and (converted_question[0] < 128):
-        #         cursor.execute("INSERT INTO questions_answers (category_id) VALUES (13)")
-        #     else: 
-        #         print("Revisa los ids de las preguntas. Algo fue mal")
+    connection.commit()
+    print(cursor.rowcount, "record(s) affected")
+    
+    connection.close()
+    return "Categorías pobladas!"
+
+
+def OptimizeCategorizeQuestions():
+    try:
+        connection = getConnection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM questions_answers")
+        all_questions_list = cursor.fetchall()
+        connection.close()
+    except Exception as e:
+        print(type(e).__name__, e)
+        return e
+
+    connection = getConnection()
+    cursor = connection.cursor()
+
+    categories_ranges = [
+        (1, 9), (2, 19), (3, 29), (4, 40), (5, 49),
+        (6, 57), (7, 67), (8, 77), (9, 87), (10, 97),
+        (11, 107), (12, 117), (13, 126)
+    ]
+
+    for converted_question in all_questions_list:
+        question_id = converted_question[0]
+
+        for category_id, (start, end) in enumerate(categories_ranges, start=1):
+            if start <= question_id < end:
+                sql_query = ("UPDATE questions_answers SET category_id = %s "
+                             "WHERE id BETWEEN %s AND %s")
+                val = (category_id, start, end - 1)
+                cursor.execute(sql_query, val)
+                break
+        else:
+            print("Haz una segunda comprobación")
+
+    connection.commit()
+    print(cursor.rowcount, "record(s) affected")
+    connection.close()
+    return "Categorías pobladas!"
+    
             
