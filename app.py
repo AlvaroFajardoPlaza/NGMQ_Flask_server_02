@@ -1,5 +1,7 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS, cross_origin
+from flask_jwt_extended import JWTManager
+
 import config
 import mysql.connector
 
@@ -8,12 +10,16 @@ from src.database.db_mysql import getConnection
 
 # Importamos las funciones de los módulos de scrapperBot, auth y trivia
 from src.ScrapperBot.scraper_bot import OptimizeCategorizeQuestions, scrapeCategories, scrapeQuestionsAnswers, categorizeQuestions
-from src.AuthMod.auth_module import getAllUsers, register_user, login_user
-from src.TriviaMod.trivia_module import getCategories, randomTriviaTest
+from src.AuthMod.auth_module import getAllUsers, registerUser, loginUser
+from src.TriviaMod.trivia_module import categorizedTriviaTest, getAnswers, getCategories, randomTriviaTest
 
 
 app = Flask(__name__)
 CORS(app)
+
+app.config["JWT_SECRET_KEY"] = "Nebraska adora los bocaditos de atún"
+jwt = JWTManager(app)
+
 
 
 #### Primera ruta al inicial nuestro servidor Flask
@@ -30,14 +36,18 @@ def get_all_users():
 
 #### Rutas de autenticación de usuarios
 @cross_origin
-@app.route("/register", methods = ['POST'])
+@app.route("/register", methods = ['GET', 'POST'])
 def register_new_user():
-    return register_user()
+    new_user_data = request.json
+    # print("Estos son los datos que se envían por el form:", new_user_data)
+    return registerUser(new_user_data)
+
 
 @cross_origin
-@app.route("/register", methods = ['POST'])
-def login():
-    return login_user()
+@app.route("/login", methods = ['GET','POST'])
+def login_user():
+    user_data = request.json
+    return loginUser(user_data)
 
 
 
@@ -73,6 +83,25 @@ def get_all_categories():
 @app.route("/random_trivia", methods=['GET'])
 def random_trivia_test():
     result = randomTriviaTest()
+    return result
+
+
+@cross_origin()
+@app.route("/categorized_trivia", methods=['GET', 'POST'])
+def categorized_trivia_test(): 
+    
+    categories_obj = request.json # { 'categories': [...]}
+    print("Estas son las categorias que deben de entrar en la función: ", categories_obj)
+
+    array_categories = categories_obj['categories']
+    result = categorizedTriviaTest(array_categories)
+    return result
+
+# Esta ruta tiene que manejar las respuestas del trivia y modificar el score del usuario
+@cross_origin
+@app.route("/get_correct_answers", methods=['GET'])
+def get_answers_for_trivia(trivia):
+    result = getAnswers(trivia)
     return result
 
 
