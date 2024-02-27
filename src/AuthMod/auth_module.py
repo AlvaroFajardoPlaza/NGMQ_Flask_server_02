@@ -1,5 +1,6 @@
 from flask import jsonify, request, session
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, decode_token
+import jwt
 from src.database.db_mysql import getConnection
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -129,3 +130,50 @@ def loginUser(user_data):
     finally:
         print("Cerramos la conexión!")
         connection.close()
+
+
+# Esta función va a recoger el token que mandamos desde el front y a devolver los datos del usuario para autenticarlo.
+def decodeToken(encoded_jwt):
+
+    try:
+        # 1. Llamamos a la función decode_token
+        print("Vamos a decodificar la info del token: ", encoded_jwt)
+        if encoded_jwt == None:
+            print("No tenemos token en local storage, salimos de la función.")
+
+        else: 
+            response = decode_token(encoded_jwt['token'])
+            # De la response, que es de tipo object, tenemos que coger el key-value 'sub', ya que es donde está alojado el username.
+            # Después, hacemos la llamada a la bbdd, para traer los datos de score y trivias completados y alojarlo en el observable User$
+            username_in_token = [response['sub']]
+            # print("Hemos conseguido el username alojado dentro del token?", username_in_token)
+
+            connection = getConnection()
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM users WHERE username=%s", (username_in_token[0], ))
+            
+            user_logged = cursor.fetchone()
+            print("Tenemos al usuario????", user_logged)
+            if user_logged:
+                return {
+                    'id': user_logged[0],
+                    'username': user_logged[1],
+                    'email': user_logged[2],
+                    'score': user_logged[4],
+                    'trivias_completed': user_logged[5],
+                }
+            else:
+                return "No hemos encontrado al usuario"
+    except jwt.exceptions.ExpiredSignatureError:
+        return "Ha expirado el token... hay que volver a iniciar sesión."
+    except jwt.exceptions.DecodeError:
+        return "Token no válido"
+    except Exception as e:
+        print(type(e).__name__, e)
+
+
+
+# Funcion de Log out para el user
+# Esta función la manejamos desde el front directamente.
+def logOut():
+    print("Tenemos que eliminar el token del local_storage y devolver al usuario a la pantalla de HOME.")

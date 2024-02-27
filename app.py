@@ -10,8 +10,8 @@ from src.database.db_mysql import getConnection
 
 # Importamos las funciones de los módulos de scrapperBot, auth y trivia
 from src.ScrapperBot.scraper_bot import OptimizeCategorizeQuestions, scrapeCategories, scrapeQuestionsAnswers, categorizeQuestions
-from src.AuthMod.auth_module import getAllUsers, registerUser, loginUser
-from src.TriviaMod.trivia_module import categorizedTriviaTest, getAnswers, getCategories, randomTriviaTest
+from src.AuthMod.auth_module import decodeToken, getAllUsers, registerUser, loginUser, decodeToken, logOut
+from src.TriviaMod.trivia_module import categorizedTriviaTest, getAnswers, getCategories, randomTriviaTest, updateUserScore
 
 
 app = Flask(__name__)
@@ -47,7 +47,21 @@ def register_new_user():
 @app.route("/login", methods = ['GET','POST'])
 def login_user():
     user_data = request.json
+    # print("Pasamos los datos del login: ", user_data)
     return loginUser(user_data)
+
+
+@cross_origin
+@app.route("/me", methods=['GET', 'POST'])
+def decode_token():
+    token_data = request.json
+    return decodeToken(token_data)
+
+
+@cross_origin
+@app.route("/logout", methods=['GET'])
+def log_user_out():
+    return logOut()
 
 
 
@@ -90,20 +104,25 @@ def random_trivia_test():
 @app.route("/categorized_trivia", methods=['GET', 'POST'])
 def categorized_trivia_test(): 
     
-    categories_obj = request.json # { 'categories': [...]}
-    print("Estas son las categorias que deben de entrar en la función: ", categories_obj)
+    categories_array = request.json # { 'categories': [...]}
+    print("Estas son las categorias que deben de entrar en la función: ", categories_array)
 
-    array_categories = categories_obj['categories']
-    result = categorizedTriviaTest(array_categories)
+    result = categorizedTriviaTest(categories_array)
     return result
 
 # Esta ruta tiene que manejar las respuestas del trivia y modificar el score del usuario
 @cross_origin
-@app.route("/get_correct_answers", methods=['GET'])
-def get_answers_for_trivia(trivia):
-    result = getAnswers(trivia)
-    return result
+@app.route("/get_trivia_answers", methods=['GET', 'POST'])
+def get_answers_for_trivia():
 
+    userAnswers = request.json
+    result: str = str(getAnswers(userAnswers))
+
+    print("Este es el resultado que mandamos al front:", result, type(result))
+    # Una vez que tenemos el resultado al trivia test, mandamos ese resultado a la función que actualiza los datos del usuario
+    updateUserScore(result)
+
+    return result
 
 
 #### Llamada al programa principal

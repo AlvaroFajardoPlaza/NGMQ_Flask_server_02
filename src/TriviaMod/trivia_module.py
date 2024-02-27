@@ -90,24 +90,58 @@ def categorizedTriviaTest(categories: list):
         categorized_trivia_test.append(register)
 
     connection.close()
-    print(categorized_trivia_test)
+    print("\n\nNuestro trivia categórico: ", categorized_trivia_test)
     return categorized_trivia_test
 
 
-def getAnswers(trivia: list):
-    # Dentro de esta función manejamos las respuestas al trivia test
-    # 1. Recibimos las respuestas del usuario
-    user_answers: list = trivia
-    print("\n\nLas respuestas del usuario: ", user_answers)
 
-    user_answers_ids: list = []
-    for answer in user_answers:
-        user_answers_ids.append(answer.id) # Guardamos los ids de las preguntas
+# Dentro de esta función manejamos las respuestas al trivia test
+# Además de devolver la respuesta del score al usuario, tenemos que actualizar los datos del usuario
+def getAnswers(userAnswers: dict):
+    try:
+        connection = getConnection()
+        cursor = connection.cursor(dictionary=True)
+        print("\n\nSi, tenemos las respuestas enviadas por el user: ", userAnswers, type(userAnswers))
+        
+        # print("\n\nTenemos al usuario?", user)
+        
+        # Extraemos las preguntas de la bbdd, tomando los valores o keys de dentro del diccionario, recuperamos las preguntas de la bbdd y las comparamos con las que envía el usuario
+        final_trivia_score = 0
 
-    # 2. Tenemos que traer de la bbdd las preguntas
+        for question_id, user_answer in userAnswers.items():
+            query: str = "SELECT * FROM questions_answers WHERE id=%s"
+            cursor.execute(query, (question_id,))
+            ddbb_question = cursor.fetchone()
+
+            if ddbb_question['ans'] == user_answer:
+                final_trivia_score += 1
+            else:
+                print("La respuesta no fue correcta")
+
+        # print("\n\nEl resultado final al triviatest es: ", final_trivia_score, type(final_trivia_score))
+        return final_trivia_score
+    
+    except TypeError as e:
+        print(type(e).__name__, e)
+        return e
+    except Exception as e:
+        print(type(e).__name__, e)
+        return e
+
+# Esta unción, llama a los datos del usuario y los actualiza
+def updateUserScore(scoreResult: str):
     connection = getConnection()
     cursor = connection.cursor()
-    cursor.execute("SEELCT * FROM questions_answers WHERE id=%s", (user_answers_ids, ))
-    db_questions = cursor.fetchall()
 
-    # 3. Cotejar lo que manda el usuario, coincide con la respuesta correcta almacenada en la bbdd
+    score = int(scoreResult)
+    print("recibimos el resultado de la score para poder operar con ello: ", score)
+
+    return
+
+
+   
+   
+
+    
+
+
