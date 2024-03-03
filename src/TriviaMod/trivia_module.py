@@ -5,6 +5,9 @@ Este módulo define las funciones encargadas de crear los tipo tests de manera r
 """
 import random
 from random import shuffle
+
+from flask import jsonify
+from src.AuthMod.auth_module import decodeToken
 from src.database.db_mysql import getConnection
 
 
@@ -128,15 +131,41 @@ def getAnswers(userAnswers: dict):
         print(type(e).__name__, e)
         return e
 
-# Esta unción, llama a los datos del usuario y los actualiza
-def updateUserScore(scoreResult: str):
-    connection = getConnection()
-    cursor = connection.cursor()
+# Esta función, llama a los datos del usuario y los actualiza
+def updateUserScore(user_token: str, scoreResult: str):
+    print("\n\nRecibimos el user y el score???\n", user_token, "\nY este es el resultado al triviaTest:", scoreResult )
 
-    score = int(scoreResult)
-    print("recibimos el resultado de la score para poder operar con ello: ", score)
+    try:    
+        if len(user_token) > 0:
+            user_data = decodeToken(user_token)
 
-    return
+            if isinstance(user_data, dict):
+                connection = getConnection()
+                cursor = connection.cursor()
+
+                # Actualizar la puntuación del usuario en la base de datos
+                cursor.execute("UPDATE users SET score=%s WHERE id =%s", (scoreResult, user_data['id']))
+                connection.commit()
+                connection.close()
+
+                print("Puntuación del usuario actualizada exitosamente.")
+                return jsonify(success=True, message="Puntuación actualizada exitosamente.")
+            else:
+                print("No se pudo obtener datos del usuario.")
+                return jsonify(success=False, message="Error al obtener datos del usuario.")
+
+        else:
+            print("Token de usuario vacío")
+            return jsonify(success=False, message="Token de usuario vacío.")
+    
+    except Exception as e:
+        print(type(e).__name__, e)
+        return jsonify(success=False, message="Error al actualizar la puntuación del usuario.")
+    
+
+
+
+
 
 
    

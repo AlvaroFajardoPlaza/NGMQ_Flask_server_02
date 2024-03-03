@@ -116,11 +116,15 @@ def categorized_trivia_test():
 def get_answers_for_trivia():
 
     userAnswers = request.json
+    user_token: dict = {
+        'token': request.headers.get('Authorization')
+    }
+        
     result: str = str(getAnswers(userAnswers))
-
     print("Este es el resultado que mandamos al front:", result, type(result))
-    # Una vez que tenemos el resultado al trivia test, mandamos ese resultado a la función que actualiza los datos del usuario
-    updateUserScore(result)
+
+    # La primera parte de la función es correcta, ya hemos enviado la respuesta al usuario. Ahora tenemos que manejar la segunda parte:
+    updateUserScore(user_token, result)
 
     return result
 

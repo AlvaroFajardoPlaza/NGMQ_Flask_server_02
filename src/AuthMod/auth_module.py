@@ -134,10 +134,9 @@ def loginUser(user_data):
 
 # Esta función va a recoger el token que mandamos desde el front y a devolver los datos del usuario para autenticarlo.
 def decodeToken(encoded_jwt):
-
+    
     try:
         # 1. Llamamos a la función decode_token
-        print("Vamos a decodificar la info del token: ", encoded_jwt)
         if encoded_jwt == None:
             print("No tenemos token en local storage, salimos de la función.")
 
@@ -153,7 +152,7 @@ def decodeToken(encoded_jwt):
             cursor.execute("SELECT * FROM users WHERE username=%s", (username_in_token[0], ))
             
             user_logged = cursor.fetchone()
-            print("Tenemos al usuario????", user_logged)
+            # print("Tenemos al usuario????", user_logged)
             if user_logged:
                 return {
                     'id': user_logged[0],
