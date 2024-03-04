@@ -142,9 +142,31 @@ def updateUserScore(user_token: str, scoreResult: str):
             if isinstance(user_data, dict):
                 connection = getConnection()
                 cursor = connection.cursor()
+                # Conseguimos los datos del usuario, los modificamos y los volvemos a enviar
+                cursor.execute("SELECT * FROM users WHERE id=%s", (user_data['id'], ))
+                user_found = cursor.fetchone()
+                connection.close()
 
-                # Actualizar la puntuación del usuario en la base de datos
-                cursor.execute("UPDATE users SET score=%s WHERE id =%s", (scoreResult, user_data['id']))
+                print("Hemos encontrado al usuario que actualizar???", user_found)
+
+                # Actualizar la puntuación del usuario en la base de datos.
+                # Recuerda, que ambas columnas las estás tratando como integers
+                user_score: int = 0
+                user_trivias_completed: int = 0
+
+                if (user_found[4] == None) and (user_found[5] == None):
+                    user_score = int(scoreResult)
+                    user_trivias_completed = 1
+                else:
+                    user_score = user_found[4] + int(scoreResult)
+                    user_trivias_completed = user_found[5] + 1
+
+                print("\n\nEl nuevo score del usuario {} es: {}. Trivias completados: {}".format(user_found[1], user_score, user_trivias_completed))
+
+                connection = getConnection()
+                cursor = connection.cursor()
+                cursor.execute("UPDATE users SET score=%s, trivias_completed=%s WHERE id=%s", (user_score, user_trivias_completed, user_found[0]))
+
                 connection.commit()
                 connection.close()
 

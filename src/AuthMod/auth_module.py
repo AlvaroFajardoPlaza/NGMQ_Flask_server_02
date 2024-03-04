@@ -9,21 +9,58 @@ from werkzeug.security import generate_password_hash, check_password_hash
 #### Al conectarnos a la bbdd, tenemos que recordar cerrar la conexión con connection.close
 
 
-# Función para extraer a todos los usuarios de la bbdd
+# Función para extraer a todos los usuarios de la bbdd.
+# Esta función viene a mostrar el resultado del trivia poll.
 def getAllUsers():
     connection = getConnection()
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM users")
     users = cursor.fetchall()
-
-    result = []
-    for user in users:
-        result.append(user)
-        print("El usuario {}, {} -> Email: {}".format(user[0], user[1], user[2]))
-    
     connection.close()
 
-    return result
+    # Tenemos que manejar la respuesta de users, ya que son tuplas
+    result = []
+    for user in users:
+        #Por cada usuario, vamos a crear un objeto que añadiremos después al array de results
+        beta_user = {
+            'username': user[1],
+            'score': user[4],
+            'trivias_completed': user[5],
+            'percentage': 0,
+        }
+        if (beta_user['trivias_completed'] != None ) and (beta_user['score'] != None):
+            beta_user['percentage'] = round((beta_user['score'] / beta_user['trivias_completed']) * 10, 3)
+        else:
+            beta_user['percentage'] = 0
+
+        result.append(beta_user)
+    
+    # Antes de devolver el resultado, lo ordenamos
+    result_sorted = sorted(result, key=lambda x: x['percentage'], reverse=True)
+
+    print("\n\n Resultado final de usuarios: ", result_sorted)
+    return result_sorted
+
+
+# Función para devolver un solo usuario cuando lo busquemos por su username
+def findByUsername(username: str):
+    try:
+        print("Recibimos el username????", username, type(username))
+
+        connection = getConnection()
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT * FROM users WHERE username=%s", (username))
+        user_found = cursor.fetchone()
+
+        print("Hemos encontrado al usuario")
+        connection.close()
+
+    except Exception as e:
+        print(type(e).__name__, e)
+        connection.close()
+        return jsonify({'message': 'Error en la solicitud', 'error': e}), 400 
+
 
 
 """

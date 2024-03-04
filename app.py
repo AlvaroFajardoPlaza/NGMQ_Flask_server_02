@@ -10,7 +10,7 @@ from src.database.db_mysql import getConnection
 
 # Importamos las funciones de los módulos de scrapperBot, auth y trivia
 from src.ScrapperBot.scraper_bot import OptimizeCategorizeQuestions, scrapeCategories, scrapeQuestionsAnswers, categorizeQuestions
-from src.AuthMod.auth_module import decodeToken, getAllUsers, registerUser, loginUser, decodeToken, logOut
+from src.AuthMod.auth_module import decodeToken, findByUsername, getAllUsers, registerUser, loginUser, decodeToken, logOut
 from src.TriviaMod.trivia_module import categorizedTriviaTest, getAnswers, getCategories, randomTriviaTest, updateUserScore
 
 
@@ -32,6 +32,13 @@ def home():
 @app.route("/users", methods=['GET'])
 def get_all_users():
     return getAllUsers()
+
+@cross_origin
+@app.route("/users/{username}", methods=['GET'])
+def find_user_by_username():
+    # Primero recibimos el username, después mandamos la solicitud
+    username = request.json
+    return findByUsername(username)
 
 
 #### Rutas de autenticación de usuarios
