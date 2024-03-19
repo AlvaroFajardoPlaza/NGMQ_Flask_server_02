@@ -56,45 +56,29 @@ def randomTriviaTest():
 
 
 def categorizedTriviaTest(categories: list):
-    # 0. Recibimos las categorías dentro de un array [1, 2, 3,...]
-    print("Hemos recibido la lista de categorias: ", categories)
+    # 0. Recibimos las categorías dentro de un array [1, 2, 3,...]. Covertimos la cadena de numeros a strings
+    numbers_to_str: list = [str(num) for num in categories]
+    numbers_str = ','.join(numbers_to_str)
+    
 
     # 1. Llamamos a la conexión y solicitamos las preguntas que coincidan con los ids de las categorías
     connection = getConnection()
     cursor = connection.cursor(dictionary=True)
 
-    # Utilizamos el método join para unir las tablas correctamente
-    query = "SELECT * FROM questions_answers " \
-            "INNER JOIN categories ON questions_answers.category_id=categories.id " \
-            "WHERE category_id=%s"
-
-    all_questions: list = []
-
-    # Iteramos sobre las categorías y ejecutamos la consulta para cada una
-    for category_id in categories:
-        cursor.execute(query, (category_id,))
-        questions_for_category = cursor.fetchall()
-        all_questions.extend(questions_for_category)
-
+    # Utilizamos la variable numbers_str para extraer nuestras preguntas, empleamos ORDER BY RAND con un limite de 10 para extraer 10 preguntas al azar
+    query = "SELECT qa.id AS id_pregunta, qa.ans AS ans1, qa.question AS pregunta, qa.w1 AS ans2, qa.w2 AS ans3, c.name AS category FROM questions_answers AS qa " \
+            "INNER JOIN categories AS c ON qa.category_id=c.id " \
+            "WHERE qa.category_id IN (%s) ORDER BY RAND() LIMIT 10"
     
-    # 2. Con el módulo random.sample, cogemos las primeras 10 preguntas de la lista y las guardamos en nuestra variable final.
-    selected_questions = random.sample(all_questions, min(10, len(all_questions)))
-    
-    categorized_trivia_test: list = []
-    for question in selected_questions:
-        register = {
-            "id_pregunta" : question['id'],
-            "pregunta" : question['question'],
-            "ans1" : question['ans'],
-            "ans2" : question['w1'],
-            "ans3" : question['w2'],
-            "category" : question['name'], # Recuerda manejar el nombre de las categorías desde la query
-        }
-        categorized_trivia_test.append(register)
+    in_p = ', '.join(list(map(lambda x: '%s', numbers_to_str)))
+    query = query % in_p
+
+    cursor.execute(query, numbers_to_str)
+    all_questions: list = cursor.fetchall()
 
     connection.close()
-    print("\n\nNuestro trivia categórico: ", categorized_trivia_test)
-    return categorized_trivia_test
+    print("\n\nNuestro trivia categórico: ", all_questions, len(all_questions))
+    return all_questions
 
 
 
