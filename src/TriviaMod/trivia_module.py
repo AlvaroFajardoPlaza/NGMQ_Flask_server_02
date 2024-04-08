@@ -57,9 +57,7 @@ def randomTriviaTest():
 
 def categorizedTriviaTest(categories: list):
     # 0. Recibimos las categorías dentro de un array [1, 2, 3,...]. Covertimos la cadena de numeros a strings
-    numbers_to_str: list = [str(num) for num in categories]
-    numbers_str = ','.join(numbers_to_str)
-    
+    numbers_to_str: list = [str(num) for num in categories]    
 
     # 1. Llamamos a la conexión y solicitamos las preguntas que coincidan con los ids de las categorías
     connection = getConnection()
@@ -79,7 +77,6 @@ def categorizedTriviaTest(categories: list):
     connection.close()
     print("\n\nNuestro trivia categórico: ", all_questions, len(all_questions))
     return all_questions
-
 
 
 # Dentro de esta función manejamos las respuestas al trivia test
